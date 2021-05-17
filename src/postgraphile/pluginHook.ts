@@ -12,6 +12,8 @@ import * as graphqlWs from 'graphql-ws';
 import { Extra as GraphQLWSContextExtra } from 'graphql-ws/lib/use/ws';
 import { ExecutionParams } from 'subscriptions-transport-ws';
 import { PostGraphileResponse } from './http/frameworks';
+import { DocumentNode, GraphQLFieldResolver, GraphQLSchema } from 'graphql';
+import { PromiseOrValue } from 'graphql/jsutils/PromiseOrValue';
 
 // tslint:disable-next-line no-any
 export type HookFn<TArg, TContext = any> = (arg: TArg, context: TContext) => TArg;
@@ -96,6 +98,19 @@ export interface PostGraphilePlugin {
       context: graphqlWs.Context<GraphQLWSContextExtra>;
       message: graphqlWs.SubscribeMessage;
       options: CreateRequestHandlerOptions;
+    }
+  >;
+  'postgraphile:ws:executionResult'?: HookFn<
+  PromiseOrValue<graphql.ExecutionResult>,
+    {
+      schema: GraphQLSchema,
+      document: DocumentNode,
+      rootValue?: any,
+      contextValue?: any,
+      variableValues?: { [key: string]: any },
+      operationName?: string,
+      fieldResolver?: GraphQLFieldResolver<any, any>,
+      subscribeFieldResolver?: GraphQLFieldResolver<any, any>,
     }
   >;
 

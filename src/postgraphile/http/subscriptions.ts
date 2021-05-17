@@ -185,6 +185,8 @@ export async function enhanceHttpServerWithWebSockets<
 
   let socketId = 0;
 
+  liveSubscribe["options"] = options; // temp
+
   let v0Wss: WebSocket.Server | null = null;
   if (websockets.includes('v0')) {
     v0Wss = new WebSocket.Server({ noServer: true });
@@ -198,7 +200,7 @@ export async function enhanceHttpServerWithWebSockets<
             : () => {
                 throw new Error('Only subscriptions are allowed over websocket transport');
               },
-        subscribe: options.subscribeFunc || (options.live ? liveSubscribe : graphqlSubscribe),
+        subscribe: options.live ? liveSubscribe : graphqlSubscribe,
         onConnect(
           connectionParams: Record<string, any>,
           _socket: WebSocket,
@@ -336,7 +338,7 @@ export async function enhanceHttpServerWithWebSockets<
             : () => {
                 throw new Error('Only subscriptions are allowed over WebSocket transport');
               },
-        subscribe: options.subscribeFunc || (options.live ? liveSubscribe : graphqlSubscribe),
+        subscribe: options.live ? liveSubscribe : graphqlSubscribe,
         onConnect(ctx) {
           const { socket, request } = ctx.extra;
           socket['postgraphileId'] = ++socketId;

@@ -20,6 +20,8 @@ import {
 } from 'graphql';
 import mapAsyncIterator from './mapAsyncIterator';
 import { isAsyncIterable } from 'iterall';
+import { PromiseOrValue } from 'graphql/jsutils/PromiseOrValue';
+import { pluginHookFromOptions } from '../pluginHook';
 
 type mixed = any;
 
@@ -93,7 +95,7 @@ function liveSubscribeImpl(
      * that it can clean up old listeners; we do this with the `finally` block.
      */
     try {
-      return await execute(
+      const executionResult = execute(
         schema,
         document,
         payload,
@@ -102,6 +104,22 @@ function liveSubscribeImpl(
         operationName,
         fieldResolver,
       );
+
+      const pluginHook = pluginHookFromOptions(liveSubscribe["options"]); // temp
+      const hookedExecutionResult = (pluginHook
+        ? pluginHook('postgraphile:ws:executionResult', executionResult, {
+            schema,
+            document,
+            rootValue,
+            contextValue,
+            variableValues,
+            operationName,
+            fieldResolver,
+            subscribeFieldResolver,
+          })
+        : executionResult) as PromiseOrValue<ExecutionResult>;
+
+      return await hookedExecutionResult;
     } finally {
       if (payload && typeof payload.release === 'function') {
         payload.release();
