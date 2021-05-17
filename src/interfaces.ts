@@ -1,5 +1,5 @@
 /* tslint:disable:no-any */
-import { GraphQLError, GraphQLSchema, SourceLocation, DocumentNode } from 'graphql';
+import { GraphQLError, GraphQLSchema, SourceLocation, DocumentNode, GraphQLFieldResolver } from 'graphql';
 import { IncomingMessage, ServerResponse } from 'http';
 import { PluginHookFn } from './postgraphile/pluginHook';
 import { Pool } from 'pg';
@@ -71,6 +71,18 @@ export interface PostGraphileOptions<
   subscriptions?: boolean;
   // [EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change)
   live?: boolean;
+
+  subscribeFunc?: (
+    argsOrSchema: any | GraphQLSchema,
+    document?: DocumentNode,
+    rootValue?: any,
+    contextValue?: any,
+    variableValues?: { [key: string]: any },
+    operationName?: string,
+    fieldResolver?: GraphQLFieldResolver<any, any>,
+    subscribeFieldResolver?: GraphQLFieldResolver<any, any>,
+  ) => any;
+
   // Choose which websocket transport libraries to use. Use commas to define multiple. Defaults to `['v0', 'v1']` if `subscriptions` or `live` are true, `[]` otherwise
   websockets?: ('v0' | 'v1')[];
   // Toggle which GraphQL websocket transport operations are supported: 'subscriptions' or 'all'. Defaults to `subscriptions`

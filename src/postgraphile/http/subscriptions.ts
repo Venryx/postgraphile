@@ -198,7 +198,7 @@ export async function enhanceHttpServerWithWebSockets<
             : () => {
                 throw new Error('Only subscriptions are allowed over websocket transport');
               },
-        subscribe: options.live ? liveSubscribe : graphqlSubscribe,
+        subscribe: options.subscribeFunc || (options.live ? liveSubscribe : graphqlSubscribe),
         onConnect(
           connectionParams: Record<string, any>,
           _socket: WebSocket,
@@ -336,7 +336,7 @@ export async function enhanceHttpServerWithWebSockets<
             : () => {
                 throw new Error('Only subscriptions are allowed over WebSocket transport');
               },
-        subscribe: options.live ? liveSubscribe : graphqlSubscribe,
+        subscribe: options.subscribeFunc || (options.live ? liveSubscribe : graphqlSubscribe),
         onConnect(ctx) {
           const { socket, request } = ctx.extra;
           socket['postgraphileId'] = ++socketId;
